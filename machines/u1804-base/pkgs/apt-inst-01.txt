@@ -1,0 +1,7 @@
+cloud-guest-utils
+e2fsprogs
+htop
+minicom
+net-tools
+snapd
+vim-nox

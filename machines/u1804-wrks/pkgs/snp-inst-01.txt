@@ -1,0 +1,4 @@
+gimp
+skype --classic
+slack --classic
+spotify --classic

@@ -1,0 +1,14 @@
+byobu
+cmake-gui
+filezilla
+git-gui
+gparted
+meld
+ssh-askpass-gnome
+terminator
+tilda
+vim-gtk3
+virt-manager
+xubuntu-desktop
+xubuntu-restricted-addons
+xubuntu-restricted-extras

@@ -1,0 +1,4 @@
+automake
+autotools-dev
+libblkid-dev
+m4

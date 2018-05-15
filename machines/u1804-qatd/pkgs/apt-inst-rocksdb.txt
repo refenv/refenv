@@ -1,0 +1,2 @@
+libgflags-dev
+libsnappy-dev

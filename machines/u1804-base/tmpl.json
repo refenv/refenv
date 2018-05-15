@@ -1,0 +1,165 @@
+{
+
+"_comment": "Usage: packer build tmpl.json",
+
+"builders": [{
+  "boot_command": [
+    "<esc><wait>",
+    "<esc><wait>",
+    "<enter><wait>",
+    "/install/vmlinuz<wait>",
+    " initrd=/install/initrd.gz<wait>",
+    " auto<wait>",
+    " console-setup/ask_detect=false<wait>",
+    " console-setup/layoutcode=us<wait>",
+    " console-setup/modelcode=pc104<wait>",
+    " debconf/frontend=noninteractive<wait>",
+    " debian-installer=en_US.UTF-8<wait>",
+    " kbd-chooser/method=us<wait>",
+    " keyboard-configuration/layout=USA<wait>",
+    " keyboard-configuration/variant=USA<wait>",
+    " locale=en_US.UTF-8<wait>",
+    " netcfg/get_domain=vm<wait>",
+    " netcfg/get_hostname={{user `hostname`}}<wait>",
+    " grub-installer/bootdev=/dev/vda<wait>",
+    " fb=false<wait>",
+    " biosdevname=0<wait>",
+    " net.ifnames=0<wait>",
+    " noapic<wait>",
+    " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ubuntu.preseed<wait>",
+    " -- <wait>",
+    "<enter><wait>"
+  ],
+
+  "net_device": "rtl8139",
+
+  "iso_url": "{{user `mirror`}}/{{user `mirror_directory`}}/{{user `iso_name`}}",
+  "iso_checksum_url": "{{user `mirror`}}/{{user `mirror_directory`}}/SHA256SUMS",
+  "iso_checksum_type": "{{user `iso_checksum_type`}}",
+
+  "boot_wait": "10s",
+  "disk_image": false,
+  "disk_size": "{{user `disk_size`}}",
+  "disk_compression": false,
+
+  "headless": "{{user `packer_headless`}}",
+  "http_directory": "{{user `packer_http_directory`}}",
+
+  "shutdown_command": "echo '{{user `password`}}' | sudo -S shutdown -P now",
+  "ssh_username": "{{user `username`}}",
+  "ssh_password": "{{user `password`}}",
+  "ssh_port": 22,
+  "ssh_wait_timeout": "10000s",
+  "accelerator": "{{user `packer_accelerator`}}",
+  "type": "qemu",
+  "vm_name": "{{ user `hostname` }}",
+
+  "qemuargs": [
+    ["-m", "{{ user `memory` }}M"],
+    ["-smp", "{{ user `cpus` }}"],
+    ["-cpu", "core2duo"]
+  ],
+
+  "output_directory": "{{user `packer_output`}}/{{user `hostname`}}-qemu"
+}],
+
+"post-processors": [{
+  "keep_input_artifact": true,
+  "output": "{{user `packer_output`}}/{{user `hostname`}}.box",
+  "type": "vagrant"
+}],
+
+"provisioners": [
+
+{
+  "source": "machines/{{user `hostname`}}/ver.major",
+  "destination": "/tmp/ver.{{user `hostname`}}.major",
+  "type": "file"
+},
+{
+  "source": "machines/{{user `hostname`}}/ver.minor",
+  "destination": "/tmp/ver.{{user `hostname`}}.minor",
+  "type": "file"
+},
+{
+  "source": "machines/{{user `hostname`}}/ver.patch",
+  "destination": "/tmp/ver.{{user `hostname`}}.patch",
+  "type": "file"
+},
+{
+  "source": "machines/{{user `hostname`}}/pkgs",
+  "destination": "/tmp",
+  "type": "file"
+},
+{
+  "source": "shared",
+  "destination": "/tmp",
+  "type": "file"
+},
+{
+  "environment_vars": [
+    "HOME_DIR=/home/{{user `username` }}",
+    "MOD_HOSTNAME={{user `hostname`}}",
+
+    "EOV=NONE"
+  ],
+  "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash -ex '{{.Path}}'",
+  "expect_disconnect": true,
+  "scripts": [
+    "{{ user `packer_scripts`}}/noop.sh",
+    "{{ user `packer_scripts`}}/ver.sh",
+
+    "{{ user `packer_scripts`}}/pkg-apt.sh",
+    "{{ user `packer_scripts`}}/pkg-snp.sh",
+    "{{ user `packer_scripts`}}/pkg-pip.sh",
+
+    "{{ user `packer_scripts`}}/grub-nics.sh",
+    "{{ user `packer_scripts`}}/grub-noisy.sh",
+
+    "{{ user `packer_scripts`}}/u1804-kernel-4.18.5.sh",
+
+    "{{ user `packer_scripts`}}/etc-fstab-floppy.sh",
+    "{{ user `packer_scripts`}}/etc-limit-nofile.sh",
+    "{{ user `packer_scripts`}}/etc-minicom.sh",
+
+    "{{ user `packer_scripts`}}/usr-grp-dialout.sh",
+    "{{ user `packer_scripts`}}/usr-grp-adm.sh",
+    "{{ user `packer_scripts`}}/usr-ssh.sh",
+
+    "{{ user `packer_scripts`}}/cleanup.sh"
+  ],
+  "type": "shell"
+}
+
+],
+
+"variables": {
+  "hostname": "u1804-base",
+
+  "fullname": "Odus Sudo",
+  "username": "odus",
+  "password": "odus.321",
+
+  "packer_output": "build",
+  "packer_scripts": "scripts",
+  "packer_http_directory": "strap",
+  "packer_accelerator": "{{env `PACKER_ACCELERATOR` }}",
+  "packer_headless": "{{env `PACKER_HEADLESS`}}",
+
+  "cpus": "2",
+  "memory": "4096",
+  "disk_size": "10240",
+
+  "version": "{{env `MACHINE_VERS`}}",
+  "build_timestamp": "{{isotime \"060102-0405\"}}",
+
+  "iso_checksum_type": "sha256",
+  "iso_name": "ubuntu-18.04.1-server-amd64.iso",
+
+  "mirror": "http://cdimage.ubuntu.com",
+  "mirror_directory": "releases/bionic/release",
+
+  "EOV": ""
+}
+
+}

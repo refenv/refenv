@@ -1,0 +1,135 @@
+{
+
+"_comment": "Usage: packer build tmpl.json",
+
+"builders": [{
+  "net_device": "rtl8139",
+
+  "iso_url": "build/u1604-mini.qcow2",
+  "iso_checksum_url": "",
+  "iso_checksum_type": "none",
+
+  "boot_wait": "10s",
+  "disk_image": true,
+  "disk_size": "{{user `disk_size`}}",
+  "disk_compression": false,
+
+  "headless": "{{user `packer_headless`}}",
+  "http_directory": "{{user `packer_http_directory`}}",
+
+  "shutdown_command": "echo '{{user `password`}}' | sudo -S shutdown -P now",
+  "ssh_username": "{{user `username`}}",
+  "ssh_password": "{{user `password`}}",
+  "ssh_port": 22,
+  "ssh_wait_timeout": "10000s",
+  "accelerator": "{{user `packer_accelerator`}}",
+  "type": "qemu",
+  "vm_name": "{{ user `hostname` }}",
+
+  "qemuargs": [
+    ["-m", "{{ user `memory` }}M"],
+    ["-smp", "{{ user `cpus` }}"],
+    ["-cpu", "core2duo"]
+  ],
+
+  "output_directory": "{{user `packer_output`}}/{{user `hostname`}}-qemu"
+}],
+
+"post-processors": [{
+  "keep_input_artifact": true,
+  "output": "{{user `packer_output`}}/{{user `hostname`}}.box",
+  "type": "vagrant"
+}],
+
+"provisioners": [
+
+{
+  "source": "machines/{{user `hostname`}}/ver.major",
+  "destination": "/tmp/ver.{{user `hostname`}}.major",
+  "type": "file"
+},
+{
+  "source": "machines/{{user `hostname`}}/ver.minor",
+  "destination": "/tmp/ver.{{user `hostname`}}.minor",
+  "type": "file"
+},
+{
+  "source": "machines/{{user `hostname`}}/ver.patch",
+  "destination": "/tmp/ver.{{user `hostname`}}.patch",
+  "type": "file"
+},
+{
+  "source": "machines/{{user `hostname`}}/pkgs",
+  "destination": "/tmp",
+  "type": "file"
+},
+{
+  "source": "shared",
+  "destination": "/tmp",
+  "type": "file"
+},
+{
+  "environment_vars": [
+    "HOME_DIR=/home/{{user `username` }}",
+    "MOD_HOSTNAME={{user `hostname`}}",
+
+    "EOV=NONE"
+  ],
+  "execute_command": "echo '{{user `password`}}' | {{.Vars}} sudo -S -E bash -ex '{{.Path}}'",
+  "expect_disconnect": true,
+  "scripts": [
+    "{{ user `packer_scripts`}}/noop.sh",
+    "{{ user `packer_scripts`}}/ver.sh",
+
+    "{{ user `packer_scripts`}}/dev-blk-grow.sh",
+    "{{ user `packer_scripts`}}/etc-hostname.sh",
+
+    "{{ user `packer_scripts`}}/pkg-apt.sh",
+    "{{ user `packer_scripts`}}/pkg-snp.sh",
+    "{{ user `packer_scripts`}}/pkg-pip.sh",
+
+    "{{ user `packer_scripts`}}/src-inst-00-fio.sh",
+    "{{ user `packer_scripts`}}/src-inst-01-nvme-cli.sh",
+    "{{ user `packer_scripts`}}/src-inst-03-spdk.sh",
+    "{{ user `packer_scripts`}}/src-inst-04-liblightnvm.sh",
+    "{{ user `packer_scripts`}}/src-inst-09-rocksdb.sh",
+
+    "{{ user `packer_scripts`}}/src-inst-02-act.sh",
+    "{{ user `packer_scripts`}}/src-inst-05-xfsprogs-dev.sh",
+    "{{ user `packer_scripts`}}/src-inst-06-xfstests-dev.sh",
+    "{{ user `packer_scripts`}}/src-inst-07-YCSB.sh",
+    "{{ user `packer_scripts`}}/src-inst-08-block-storage.sh",
+
+    "{{ user `packer_scripts`}}/src-inst-10-blktests.sh",
+
+    "{{ user `packer_scripts`}}/cleanup.sh"
+  ],
+  "type": "shell"
+}
+
+],
+
+"variables": {
+  "hostname": "u1604-qatd",
+
+  "fullname": "Odus Sudo",
+  "username": "odus",
+  "password": "odus.321",
+
+  "packer_output": "build",
+  "packer_scripts": "scripts",
+  "packer_http_directory": "strap",
+  "packer_accelerator": "{{env `PACKER_ACCELERATOR` }}",
+  "packer_headless": "{{env `PACKER_HEADLESS`}}",
+
+  "cpus": "2",
+  "memory": "4096",
+  "disk_size": "61440",
+
+  "version": "{{env `MACHINE_VERS`}}",
+  "build_timestamp": "{{isotime \"060102-0405\"}}",
+
+  "EOV": ""
+}
+
+}

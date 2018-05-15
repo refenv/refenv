@@ -1,0 +1,16 @@
+autoconf
+build-essential
+gettext
+git
+gnuplot
+libaio-dev
+libaio1
+libgconf2-dev
+libncurses5-dev
+libtool
+make
+php-cli
+python-dev
+util-linux
+wkhtmltopdf
+zip
