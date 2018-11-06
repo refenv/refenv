@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Installs liblightnvm from master into system paths
+# Installs liblightnvm v0.1.7 into system paths
 #
 set -e
 
