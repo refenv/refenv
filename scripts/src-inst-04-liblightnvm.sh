@@ -17,7 +17,9 @@ cd $REPOS_PATH
 git checkout .
 git checkout $REPOS_TAG
 
-make dev
+make clean cli_on tests_on examples_on ioctl_on lbd_off spdk_off debug_off
+deb_on configure build
+make install-deb
 
 echo "- {'name': '$NAME', 'tag': '$REPOS_TAG'}" >> /opt/ver.refenv.yml
 echo "# DONE: '$NAME'"
