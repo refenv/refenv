@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Installs fio tagged fio-3.5 from source into system paths,
+# Installs fio tagged fio-3.12 from source into system paths,
 # and additionally into:
 #
 # /opt/fio-2.2.8
@@ -11,8 +11,8 @@ set -e
 NAME=fio
 REPOS_URL=https://github.com/axboe/fio.git
 REPOS_PATH=$(mktemp -d -u --suffix=-$NAME -t repos-XXXXXX)
-REPOS_TAGS="fio-2.2.8 fio-2.2.10 fio-3.5"
-REPOS_TAGS_SYSINSTALL="fio-3.5"
+REPOS_TAGS="fio-2.2.8 fio-2.2.10 fio-3.12"
+REPOS_TAGS_SYSINSTALL="fio-3.12"
 
 echo "# install '$NAME' from '$REPOS_URL' via '$REPOS_PATH'"
 

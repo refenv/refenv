@@ -7,7 +7,7 @@ set -e
 NAME=liblightnvm
 REPOS_URL=https://github.com/OpenChannelSSD/liblightnvm.git
 REPOS_PATH=$(mktemp -d -u --suffix=-$NAME -t repos-XXXXXX)
-REPOS_TAG="master"
+REPOS_TAG="v0.1.7"
 
 echo "# install '$NAME' from '$REPOS_URL'/'$REPOS_TAG' to '$REPOS_PATH'"
 
