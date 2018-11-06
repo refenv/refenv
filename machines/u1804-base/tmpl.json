@@ -120,6 +120,7 @@
 
     "{{ user `packer_scripts`}}/etc-fstab-floppy.sh",
     "{{ user `packer_scripts`}}/etc-limit-nofile.sh",
+    "{{ user `packer_scripts`}}/etc-limit-memlock.sh",
     "{{ user `packer_scripts`}}/etc-minicom.sh",
 
     "{{ user `packer_scripts`}}/usr-grp-dialout.sh",
