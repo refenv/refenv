@@ -7,7 +7,7 @@ set -e
 NAME=rocksdb
 REPOS_URL=https://github.com/OpenChannelSSD/rocksdb.git
 REPOS_PATH=$(mktemp -d -u --suffix=-$NAME -t repos-XXXXXX)
-REPOS_TAG="v5.4.6_ocssd"
+REPOS_TAG="v5.4.6_ocssd_v0.1.7"
 
 OPT_PATH=/opt/$NAME
 
